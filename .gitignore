@@ -1,1 +1,4 @@
+__pycache__/
+*.pyc
+telemetry_data.json
 .env

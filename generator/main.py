@@ -2,10 +2,14 @@ import random
 import time 
 import dotenv
 import requests
+import os
 
 dotenv.load_dotenv("../.env")
 
 URL = os.getenv("URL")
+
+if not URL:
+    raise ValueError("URL nie został znaleziony w .env")
 
 weapons = ["knife","ak-47","m4a1","sniper","usp-s"]
 
