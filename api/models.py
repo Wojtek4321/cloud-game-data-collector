@@ -5,8 +5,13 @@ class Position(BaseModel):
     y: float
     
 class PlayerEvent(BaseModel):
-    player_id: int
+    
+    player_id: str
+    victim_id: str
+
     weapon: str
     event_type: str
     timestamp: int
     position: Position
+    
+    players_remaining: int

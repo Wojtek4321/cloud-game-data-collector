@@ -8,7 +8,8 @@ load_dotenv("../.env")
 
 AZURE_CONNECTION_STRING = os.getenv("AZURE_CONNECTION_STRING")
 CONTAINER_NAME = "telemetry"
-FILE_NAME = "combatdata_logs.jsonl"
+
+FILE_NAME = "arena_logs.jsonl"
 
 app = FastAPI()
 
@@ -16,14 +17,11 @@ service_client = DataLakeServiceClient.from_connection_string(AZURE_CONNECTION_S
 file_system_client = service_client.get_file_system_client(file_system=CONTAINER_NAME)
 file_client = file_system_client.get_file_client(FILE_NAME)
 
-
 try:
-    
     props = file_client.get_file_properties()
     current_offset = props.size
     print(f"Continuing to append data. Initial offset: {current_offset}")
 except Exception:
-    
     file_client.create_file()
     current_offset = 0
     print("File did not exist, created new one.")
@@ -32,7 +30,7 @@ except Exception:
 async def receive_telemetry(event: PlayerEvent):
     global current_offset
     
-    data = event.dict()
+    data = event.model_dump() if hasattr(event, "model_dump") else event.dict()
     encoded_data = json.dumps(data) + "\n"
     data_length = len(encoded_data)
     
@@ -41,7 +39,6 @@ async def receive_telemetry(event: PlayerEvent):
         file_client.flush_data(current_offset + data_length)
         current_offset += data_length
     except Exception:
-        
         file_client.create_file()
         file_client.append_data(encoded_data, offset=0, length=data_length)
         file_client.flush_data(data_length)
