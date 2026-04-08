@@ -1,4 +1,4 @@
-# Cloud Game Telemetry Pipeline (End-to-End)
+# Cloud Game Data Collector
 
 A real-time data engineering pipeline built to simulate, ingest, and process telemetry data from a 100-player Battle Royale game. The project demonstrates a complete data lifecycle from event generation to analytical SQL dashboards.
 
