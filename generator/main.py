@@ -11,25 +11,38 @@ URL = os.getenv("URL")
 if not URL:
     raise ValueError("URL nie został znaleziony w .env")
 
-weapons = ["knife","ak-47","m4a1","sniper","usp-s"]
+WEAPONS = ["knife","ak-47","m4a1","sniper","usp-s"]
 
-def generate_telemetry_data():
+
+
+def get_unique_players(limit=1000):
+    ids = list(range(1, limit + 1))
+    random.shuffle(ids)
+    for p_id in ids:
+        yield p_id
+
+player_pool = get_unique_players(1000)
+
+def generate_telemetry_data(p_id):
     return {
-        "player_id": random.randint(1, 1000),
-        "weapon": random.choice(weapons),
+        "player_id": p_id,
+        "weapon": random.choice(WEAPONS),
         "event_type": "death",
         "timestamp": int(time.time()),
-        "position":{
-            "x": random.uniform(-100, 100),
-            "y": random.uniform(-100, 100),
+        "position": {
+            "x": round(random.uniform(-100, 100), 2),
+            "y": round(random.uniform(-100, 100), 2),
         },
     }
 while True:
-    data = generate_telemetry_data()
-    try:
-        response = requests.post(URL, json=data)
-        print("Data sent:", data, "Response:", response.status_code)
-    except Exception as e:
-        print("Error sending data:", e)
-    time.sleep(1)
+    for p_id in player_pool:
+        data = generate_telemetry_data(p_id)
+        
+        try:
+            response = requests.post(URL, json=data, timeout=3)
+            print(f"SENT Player {p_id} died Status: {response.status_code}")
+        except requests.exceptions.RequestException as e:
+            print(f"ERROR Connection failed: {e}")
+
+        time.sleep(1) 
 

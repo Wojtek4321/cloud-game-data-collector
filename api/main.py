@@ -18,11 +18,15 @@ file_client = file_system_client.get_file_client(FILE_NAME)
 
 
 try:
-    file_client.create_file()
-    current_offset = 0
-except Exception:
+    
     props = file_client.get_file_properties()
     current_offset = props.size
+    print(f"Continuing to append data. Initial offset: {current_offset}")
+except Exception:
+    
+    file_client.create_file()
+    current_offset = 0
+    print("File did not exist, created new one.")
 
 @app.post("/telemetry")
 async def receive_telemetry(event: PlayerEvent):
